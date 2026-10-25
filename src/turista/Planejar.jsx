@@ -2,7 +2,8 @@
 //  1. confirmar local e data (vendo o risco);
 //  2. se o risco passar de 80%: "Você tem certeza?". Se o turista assumir o
 //     risco, os bombeiros recebem NA HORA o alerta de potencial vítima;
-//  3. reserva: dados do grupo (pessoas, adulto/criança/idoso, quem não sabe nadar);
+//  3. reserva: o grupo, montado como um carrinho (ex.: 2 adultos que nadam,
+//     1 criança que não nada);
 //  4. concluído.
 
 import { useEffect, useState } from 'react';
@@ -14,7 +15,18 @@ import { concluirReserva, FAIXAS, registrarPotencialVitima, resumirPessoas } fro
 import { SeletorDeDia } from './DetalheTrilha.jsx';
 
 const MAX_PESSOAS = 30;
-const novaPessoa = () => ({ faixa: 'adulto', sabeNadar: true });
+
+// Itens do "carrinho": cada faixa etária, nadando ou não.
+const ITENS = FAIXAS.flatMap((faixa) => [
+  { id: `${faixa.id}-nada`, faixa: faixa.id, sabeNadar: true, rotulo: faixa.rotulo, detalhe: 'nada' },
+  { id: `${faixa.id}-nao-nada`, faixa: faixa.id, sabeNadar: false, rotulo: faixa.rotulo, detalhe: 'não nada' },
+]);
+
+// Começa com 1 adulto que nada (o próprio responsável).
+const GRUPO_INICIAL = { 'adulto-nada': 1 };
+
+const listarPessoas = (grupo) =>
+  ITENS.flatMap((item) => Array.from({ length: grupo[item.id] ?? 0 }, () => ({ faixa: item.faixa, sabeNadar: item.sabeNadar })));
 
 export default function Planejar({ trilha, dataInicial, viagemId: viagemExistente, perfil, aoVoltar, aoConcluir }) {
   const [etapa, setEtapa] = useState(viagemExistente ? 'reserva' : 'local');
@@ -25,7 +37,8 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
   const [erro, setErro] = useState(null);
 
   const [responsavel, setResponsavel] = useState(perfil);
-  const [pessoas, setPessoas] = useState([novaPessoa()]);
+  const [grupo, setGrupo] = useState(GRUPO_INICIAL);
+  const pessoas = listarPessoas(grupo);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -61,7 +74,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
       setEtapa('reserva');
     });
 
-  const formularioValido = responsavel.nome.trim() && responsavel.telefone.trim();
+  const formularioValido = pessoas.length > 0 && responsavel.nome.trim() && responsavel.telefone.trim();
 
   const enviarReserva = (evento) => {
     evento.preventDefault();
@@ -79,12 +92,12 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
     });
   };
 
-  const mudarQuantidade = (quantidade) => {
-    const alvo = Math.min(MAX_PESSOAS, Math.max(1, quantidade));
-    setPessoas((atual) => (alvo > atual.length ? [...atual, ...Array.from({ length: alvo - atual.length }, novaPessoa)] : atual.slice(0, alvo)));
-  };
-
-  const alterarPessoa = (indice, campos) => setPessoas((atual) => atual.map((p, i) => (i === indice ? { ...p, ...campos } : p)));
+  const mudarItem = (id, delta) =>
+    setGrupo((atual) => {
+      const quantidade = (atual[id] ?? 0) + delta;
+      if (quantidade < 0 || (delta > 0 && listarPessoas(atual).length >= MAX_PESSOAS)) return atual;
+      return { ...atual, [id]: quantidade };
+    });
 
   const resumo = resumirPessoas(pessoas);
 
@@ -159,51 +172,35 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
           </div>
 
           <div className="cartao" style={{ display: 'grid', gap: 12 }}>
-            <div className="linha entre">
-              <h2>Número de pessoas</h2>
-              <div className="contador">
-                <button type="button" onClick={() => mudarQuantidade(pessoas.length - 1)} aria-label="Menos uma pessoa">
-                  −
-                </button>
-                <strong aria-live="polite">{pessoas.length}</strong>
-                <button type="button" onClick={() => mudarQuantidade(pessoas.length + 1)} aria-label="Mais uma pessoa">
-                  +
-                </button>
-              </div>
-            </div>
-
-            {pessoas.map((pessoa, i) => {
-              const nome = i === 0 ? 'Você' : `Pessoa ${i + 1}`;
-              return (
-                <div key={i} className="pessoa">
-                  <span className="pessoa__nome">{nome}</span>
-                  <div className="pessoa__nada">
-                    <span>Nada?</span>
-                    <div className="alternador" role="group" aria-label={`${nome} sabe nadar?`}>
-                      <button type="button" aria-pressed={pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: true })}>
-                        Sim
+            <h2>Quem vai no grupo?</h2>
+            <ul className="carrinho">
+              {ITENS.map((item) => {
+                const quantidade = grupo[item.id] ?? 0;
+                const descricao = `${item.rotulo.toLowerCase()} que ${item.detalhe}`;
+                return (
+                  <li key={item.id} className={!item.sabeNadar && quantidade > 0 ? 'atencao' : undefined}>
+                    <span>
+                      <strong>{item.rotulo}</strong>
+                      <span className={item.sabeNadar ? 'suave' : 'carrinho__nao-nada'}> · {item.detalhe}</span>
+                    </span>
+                    <div className="contador">
+                      <button type="button" onClick={() => mudarItem(item.id, -1)} disabled={quantidade === 0} aria-label={`Remover ${descricao}`}>
+                        −
                       </button>
-                      <button type="button" className="atencao" aria-pressed={!pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: false })}>
-                        Não
+                      <strong aria-live="polite">{quantidade}</strong>
+                      <button type="button" onClick={() => mudarItem(item.id, +1)} aria-label={`Adicionar ${descricao}`}>
+                        +
                       </button>
                     </div>
-                  </div>
-                  <div className="alternador pessoa__faixa" role="group" aria-label={`${nome}: adulto, criança ou idoso`}>
-                    {FAIXAS.map((faixa) => (
-                      <button
-                        key={faixa.id}
-                        type="button"
-                        className={faixa.id !== 'adulto' ? 'atencao' : undefined}
-                        aria-pressed={pessoa.faixa === faixa.id}
-                        onClick={() => alterarPessoa(i, { faixa: faixa.id })}
-                      >
-                        {faixa.rotulo}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="carrinho__total">
+              <span>Total</span>
+              <strong>{pessoas.length === 1 ? '1 pessoa' : `${pessoas.length} pessoas`}</strong>
+            </div>
 
             <div className="resumo-grupo">
               <span className={resumo.criancas ? 'ativo' : ''}>

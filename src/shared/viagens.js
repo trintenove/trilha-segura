@@ -23,8 +23,8 @@ export const armazenamento =
 
 // Faixa etária de cada pessoa do grupo, escolhida com um toque.
 export const FAIXAS = [
-  { id: 'crianca', rotulo: 'Criança' }, // até 11 anos (ECA)
   { id: 'adulto', rotulo: 'Adulto' },
+  { id: 'crianca', rotulo: 'Criança' }, // até 11 anos (ECA)
   { id: 'idoso', rotulo: 'Idoso' }, // 60 anos ou mais (Estatuto da Pessoa Idosa)
 ];
 
