@@ -1,0 +1,94 @@
+body {
+  background: var(--grafite);
+}
+
+.inicio {
+  min-height: 100vh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 16px 24px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.inicio__marca {
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+
+.inicio__marca h1 {
+  font-size: 2.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.inicio__marca p {
+  margin: 0;
+  color: var(--prata);
+}
+
+.inicio__opcoes {
+  display: grid;
+  gap: 14px;
+}
+
+.inicio__opcao {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--grafite);
+  text-decoration: none;
+  transition: transform 0.1s ease;
+}
+
+.inicio__opcao:hover {
+  transform: translateY(-2px);
+}
+
+.inicio__opcao > svg:first-child {
+  color: var(--vermelho);
+  flex-shrink: 0;
+}
+
+.inicio__opcao > svg:last-child {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.inicio__opcao h2 {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+}
+
+.inicio__opcao p {
+  margin: 2px 0 0;
+  color: var(--texto-suave);
+  font-size: 0.92rem;
+}
+
+.inicio__opcao--bombeiro {
+  background: var(--vermelho);
+  color: #fff;
+}
+
+.inicio__opcao--bombeiro > svg:first-child {
+  color: var(--amarelo);
+}
+
+.inicio__opcao--bombeiro p {
+  color: #ffd9de;
+}
+
+.inicio__rodape {
+  margin-top: auto;
+  text-align: center;
+  color: var(--prata);
+  font-size: 0.8rem;
+}

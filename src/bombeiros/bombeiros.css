@@ -1,0 +1,336 @@
+/* App dos bombeiros: painel responsivo (celular → telão). */
+
+.app-bombeiros {
+  min-height: 100vh;
+}
+
+.topo__usuario {
+  display: grid;
+  text-align: right;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.topo__usuario span {
+  color: var(--prata);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .topo__usuario {
+    display: none;
+  }
+}
+
+h2 {
+  font-size: 1.3rem;
+  text-transform: uppercase;
+}
+
+.objetivo {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--vermelho);
+  color: #fff;
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  border-left: 8px solid var(--amarelo);
+}
+
+.objetivo p {
+  margin: 0;
+}
+
+.objetivo svg {
+  color: var(--amarelo);
+  flex-shrink: 0;
+}
+
+.cadastro-profissional {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.duas-colunas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ---- Painel ------------------------------------------------------------- */
+
+.painel {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.painel__barra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.painel__exemplos {
+  margin-left: auto;
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .indicadores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.indicador {
+  background: var(--grafite);
+  color: #fff;
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  display: grid;
+  gap: 2px;
+}
+
+.indicador > svg {
+  color: var(--amarelo);
+}
+
+.indicador--destaque {
+  background: var(--risco-critico);
+}
+
+.indicador--destaque > svg {
+  color: #fff;
+}
+
+.indicador__valor {
+  font-family: var(--fonte-titulo);
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.indicador__rotulo {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.indicador__detalhe {
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+.painel__grade {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .painel__grade {
+    grid-template-columns: 1fr;
+  }
+}
+
+.painel__mapa {
+  position: sticky;
+  top: 86px;
+}
+
+@media (max-width: 980px) {
+  .painel__mapa {
+    position: static;
+  }
+}
+
+.painel__prioridades {
+  display: grid;
+  gap: 10px;
+}
+
+.prioridades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+/* ---- Cartão de localidade ----------------------------------------------- */
+
+.localidade {
+  padding: 0;
+  overflow: hidden;
+  border-left: 6px solid var(--cor-nivel);
+}
+
+.localidade--aberta {
+  outline: 2px solid var(--grafite);
+}
+
+.localidade__cabecalho {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.localidade__cabecalho > span:nth-child(2) {
+  display: grid;
+}
+
+.localidade__posicao {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--grafite);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.localidade__nome {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.localidade__numeros {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 0 14px 12px;
+}
+
+.numero {
+  display: grid;
+  justify-items: center;
+  background: var(--fundo);
+  border-radius: 10px;
+  padding: 6px 4px;
+  font-size: 0.72rem;
+  color: var(--texto-suave);
+}
+
+.numero strong {
+  font-family: var(--fonte-titulo);
+  font-size: 1.4rem;
+  line-height: 1.1;
+  color: var(--texto);
+}
+
+.numero--atencao {
+  background: #fff4cc;
+  color: #6b4e00;
+}
+
+.localidade__alerta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fde8ea;
+  color: #7d0b18;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 8px 14px;
+}
+
+.cadastros {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.cadastros th,
+.cadastros td {
+  text-align: left;
+  padding: 7px 14px;
+  border-top: 1px solid var(--borda);
+  vertical-align: top;
+}
+
+.cadastros th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--texto-suave);
+}
+
+.cadastros tr.sinalizada td:first-child {
+  box-shadow: inset 4px 0 0 var(--risco-critico);
+}
+
+.cadastros__telefone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+/* ---- Alertas ao vivo ---------------------------------------------------- */
+
+.alertas-ao-vivo {
+  position: fixed;
+  top: 84px;
+  right: 16px;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  gap: 10px;
+  z-index: 3000;
+}
+
+.alerta-ao-vivo {
+  background: var(--risco-critico);
+  color: #fff;
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  border: 3px solid var(--amarelo);
+  animation: entrar 0.35s ease-out, piscar 1s ease-in-out 3;
+}
+
+.alerta-ao-vivo p {
+  margin: 8px 0 10px;
+}
+
+@keyframes entrar {
+  from {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes piscar {
+  50% {
+    border-color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alerta-ao-vivo {
+    animation: none;
+  }
+}
