@@ -15,26 +15,33 @@ const esperar = (ms) => new Promise((resolver) => setTimeout(resolver, ms));
 // Ocorrências de cabeça d'água / afogamento registradas pelos bombeiros
 // em cada localidade nos últimos 5 anos (simulado).
 const OCORRENCIAS_BOMBEIROS = {
+  'cipo-grande': 15,
+  farofa: 9,
+  lapinha: 6,
   tabuleiro: 11,
-  'cipo-grande': 14,
-  capitolio: 8,
-  'santa-barbara': 6,
-  'vale-da-lua': 15,
-  buracao: 12,
-  fumaca: 5,
-  toboga: 9,
-  'veu-itatiaia': 7,
-  'toca-ilhabela': 4,
-  'saltao-brotas': 10,
-  itaimbezinho: 3,
+  'milho-verde': 5,
+  capitolio: 12,
+  'casca-danta': 8,
+  ibitipoca: 7,
+  carrancas: 10,
+  'sao-thome': 4,
+  macacos: 13,
+  brumadinho: 3,
 };
 
-// Tendência de chuva da região nesta época do ano (simulado).
-const CHUVA_BASE_REGIAO = { MG: 72, GO: 78, BA: 55, RJ: 68, SP: 64, RS: 45 };
+// Tendência de chuva de cada região de Minas nesta época do ano (simulado).
+const CHUVA_BASE_REGIAO = {
+  'Serra do Espinhaço': 74,
+  'Alto Jequitinhonha': 60,
+  'Oeste / Canastra': 76,
+  'Zona da Mata': 72,
+  'Sul de Minas': 68,
+  'Região Metropolitana de BH': 70,
+};
 
 // Cenário fixo para a apresentação: garante que sempre exista ao menos um
 // local com risco crítico (> 80%) para demonstrar o alerta aos bombeiros.
-const CHUVA_MINIMA_DEMO = { 'vale-da-lua': 86 };
+const CHUVA_MINIMA_DEMO = { 'cipo-grande': 86 };
 
 export async function buscarOcorrenciasBombeiros() {
   await esperar(250);
@@ -53,7 +60,7 @@ export async function buscarPrevisaoDefesaCivil(dias = DIAS_DE_PREVISAO) {
     previsao: Array.from({ length: dias }, (_, i) => {
       const data = somarDias(hoje, i);
       const sorteio = aleatorioComSemente(`${trilha.id}|${data}`);
-      const sorteada = CHUVA_BASE_REGIAO[trilha.uf] + (sorteio() - 0.4) * 50;
+      const sorteada = CHUVA_BASE_REGIAO[trilha.regiao] + (sorteio() - 0.4) * 50;
       const probChuva = Math.round(Math.min(98, Math.max(5, CHUVA_MINIMA_DEMO[trilha.id] ?? 0, sorteada)));
       const milimetros = Math.round((probChuva / 100) ** 2 * 60 * sorteio());
       return { data, probChuva, milimetros };

@@ -38,7 +38,7 @@ export default function DetalheTrilha({ trilha, aoVoltar, aoPlanejar }) {
       <div>
         <h1 className="titulo-tela">{trilha.nome}</h1>
         <div className="suave">
-          {trilha.cidade}/{trilha.uf} · {trilha.tipo}
+          {trilha.cidade} · {trilha.tipo}
         </div>
       </div>
 
@@ -50,14 +50,14 @@ export default function DetalheTrilha({ trilha, aoVoltar, aoPlanejar }) {
             <Icone nome="chuva" />
             <div>
               <strong>{dia.probChuva}%</strong>
-              <div className="pequeno suave">chance de chuva · Defesa Civil</div>
+              <div className="pequeno suave">chance de chuva · Defesa Civil de MG</div>
             </div>
           </div>
           <div>
             <Icone nome="sirene" />
             <div>
               <strong>{trilha.ocorrencias} ocorrências</strong>
-              <div className="pequeno suave">histórico {rotuloHistorico(trilha.ocorrencias)} · Bombeiros (5 anos)</div>
+              <div className="pequeno suave">histórico {rotuloHistorico(trilha.ocorrencias)} · CBMMG (5 anos)</div>
             </div>
           </div>
         </div>

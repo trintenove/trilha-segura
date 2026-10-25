@@ -2,11 +2,9 @@ import { useState } from 'react';
 import Icone from '../shared/componentes/Icone.jsx';
 import { Objetivo } from './Painel.jsx';
 
-const CORPORACOES = ['CBMMG', 'CBMGO', 'CBMBA', 'CBMERJ', 'CBPMESP', 'CBMRS', 'Outra'];
-
 // Cadastro do profissional. Na prova de conceito não há validação da matrícula.
 export default function CadastroProfissional({ aoEntrar }) {
-  const [form, setForm] = useState({ nome: '', matricula: '', corporacao: CORPORACOES[0], unidade: '' });
+  const [form, setForm] = useState({ nome: '', matricula: '', corporacao: 'CBMMG', unidade: '' });
   const alterar = (campo) => (e) => setForm({ ...form, [campo]: e.target.value });
   const valido = form.nome.trim() && form.matricula.trim() && form.unidade.trim();
 
@@ -30,11 +28,7 @@ export default function CadastroProfissional({ aoEntrar }) {
         <div className="duas-colunas">
           <label className="campo">
             <span>Corporação</span>
-            <select className="entrada" value={form.corporacao} onChange={alterar('corporacao')}>
-              {CORPORACOES.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
+            <input className="entrada" value="CBMMG – Minas Gerais" readOnly />
           </label>
           <label className="campo">
             <span>Matrícula</span>

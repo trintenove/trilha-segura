@@ -13,7 +13,7 @@ export function Carregando({ texto = 'Carregando dados…' }) {
 export function AvisoProvaDeConceito() {
   return (
     <div className="aviso-poc">
-      <strong>Prova de conceito:</strong> ocorrências dos bombeiros e previsão da Defesa Civil são <strong>dados simulados</strong>.
+      <strong>Prova de conceito:</strong> ocorrências do CBMMG e previsão da Defesa Civil de MG são <strong>dados simulados</strong>.
     </div>
   );
 }

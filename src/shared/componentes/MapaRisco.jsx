@@ -3,7 +3,7 @@ import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-le
 import 'leaflet/dist/leaflet.css';
 import { nivelDoRisco } from '../risco.js';
 
-const CENTRO_BRASIL = [-18.5, -46.5];
+const CENTRO_MINAS = [-19.8, -44.6];
 
 // Ajusta o enquadramento para mostrar todos os pontos, ou voa até o selecionado.
 function Enquadrar({ pontos, selecionado }) {
@@ -33,7 +33,7 @@ export default function MapaRisco({ pontos, selecionado, aoSelecionar, altura })
   const ordenados = [...pontos].sort((a, b) => a.risco - b.risco);
 
   return (
-    <MapContainer center={CENTRO_BRASIL} zoom={5} className="mapa" style={altura ? { height: altura } : undefined} scrollWheelZoom={false}>
+    <MapContainer center={CENTRO_MINAS} zoom={7} className="mapa" style={altura ? { height: altura } : undefined} scrollWheelZoom={false}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"

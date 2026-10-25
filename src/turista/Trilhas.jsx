@@ -18,7 +18,7 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
   const visiveis = useMemo(() => {
     const termo = busca.trim().toLowerCase();
     return trilhas
-      .filter((t) => !termo || `${t.nome} ${t.cidade} ${t.uf}`.toLowerCase().includes(termo))
+      .filter((t) => !termo || `${t.nome} ${t.cidade} ${t.regiao}`.toLowerCase().includes(termo))
       .sort(ORDENS[ordem]);
   }, [trilhas, busca, ordem]);
 
@@ -27,9 +27,9 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
   return (
     <div className="pagina">
       <div>
-        <h1 className="titulo-tela">Risco nas trilhas hoje</h1>
+        <h1 className="titulo-tela">Trilhas de Minas hoje</h1>
         <p className="suave pequeno" style={{ margin: '4px 0 0' }}>
-          Atualizado às {formatarHora(atualizadoEm)} · Corpo de Bombeiros + Defesa Civil
+          Atualizado às {formatarHora(atualizadoEm)} · CBMMG + Defesa Civil de MG
         </p>
       </div>
 
@@ -43,7 +43,7 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
       )}
 
       <div className="linha entre quebra">
-        <input className="entrada" style={{ flex: '1 1 200px' }} placeholder="Buscar trilha ou cidade" value={busca} onChange={(e) => setBusca(e.target.value)} />
+        <input className="entrada" style={{ flex: '1 1 200px' }} placeholder="Buscar trilha, cidade ou região" value={busca} onChange={(e) => setBusca(e.target.value)} />
         <div className="alternador" role="group" aria-label="Visualização">
           <button aria-pressed={visao === 'lista'} onClick={() => setVisao('lista')}>
             Lista
@@ -67,7 +67,7 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
       {visao === 'mapa' ? (
         <MapaRisco
           altura="58vh"
-          pontos={visiveis.map((t) => ({ id: t.id, lat: t.lat, lng: t.lng, risco: t.hoje.risco, titulo: t.nome, detalhe: `${t.cidade}/${t.uf} · toque para ver` }))}
+          pontos={visiveis.map((t) => ({ id: t.id, lat: t.lat, lng: t.lng, risco: t.hoje.risco, titulo: t.nome, detalhe: `${t.cidade} · toque para ver` }))}
           aoSelecionar={aoAbrir}
         />
       ) : (
@@ -79,7 +79,7 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
                   <div style={{ minWidth: 0 }}>
                     <h2>{trilha.nome}</h2>
                     <div className="suave pequeno">
-                      {trilha.cidade}/{trilha.uf} · {trilha.tipo}
+                      {trilha.cidade} · {trilha.regiao}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>

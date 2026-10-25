@@ -106,7 +106,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
       <div>
         <h1 className="titulo-tela">{trilha.nome}</h1>
         <div className="suave">
-          {trilha.cidade}/{trilha.uf} · {formatarDataLonga(data)}
+          {trilha.cidade} · {formatarDataLonga(data)}
         </div>
       </div>
 
@@ -241,7 +241,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
               <div className="faixa-alerta faixa-alerta--forte">
                 <Icone nome="sirene" />
                 <span>
-                  Se continuar, seus dados serão <strong>enviados imediatamente ao Corpo de Bombeiros</strong> como <strong>potencial vítima</strong>.
+                  Se continuar, seus dados serão <strong>enviados imediatamente ao Corpo de Bombeiros de Minas Gerais</strong> como <strong>potencial vítima</strong>.
                 </span>
               </div>
               {erro && <div className="faixa-alerta">{erro}</div>}

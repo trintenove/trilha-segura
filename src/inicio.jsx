@@ -11,7 +11,7 @@ function Inicio() {
       <div className="inicio__marca">
         <Escudo tamanho={72} />
         <h1>Trilha Segura</h1>
-        <p>Prevenção de acidentes com cabeça d'água em trilhas e cachoeiras.</p>
+        <p>Prevenção de acidentes com cabeça d'água em trilhas e cachoeiras de Minas Gerais.</p>
       </div>
       <div className="faixa-refletiva" />
       <div className="inicio__opcoes">

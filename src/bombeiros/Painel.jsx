@@ -261,7 +261,7 @@ function CartaoLocalidade({ localidade, posicao, aberto, aoAlternar }) {
         <span style={{ minWidth: 0, flex: 1 }}>
           <strong className="localidade__nome">{trilha.nome}</strong>
           <span className="pequeno suave">
-            {trilha.cidade}/{trilha.uf}
+            {trilha.cidade} · {trilha.regiao}
           </span>
         </span>
         <SeloRisco risco={localidade.risco} />

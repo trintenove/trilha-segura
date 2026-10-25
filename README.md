@@ -1,21 +1,23 @@
 # Trilha Segura 🚒🌊
 
-Prova de conceito (hackathon) para **prevenir acidentes com cabeça d'água** em trilhas e cachoeiras.
+Prova de conceito (hackathon) para **prevenir acidentes com cabeça d'água** em trilhas e cachoeiras de **Minas Gerais**.
 São dois apps com a mesma identidade visual, inspirada nos bombeiros:
 
 | App | Para quem | O que faz |
 |---|---|---|
 | **Turista** (`/turista/`) | banhista / turista ecológico | vê a % de risco de cada trilha, confirma o local e faz a "reserva de viagem" |
-| **Bombeiros** (`/bombeiros/`) | profissional do Corpo de Bombeiros | mapa e lista de prioridade para **mobilizar recursos nas áreas de maior risco** |
+| **Bombeiros** (`/bombeiros/`) | profissional do Corpo de Bombeiros Militar de MG (CBMMG) | mapa e lista de prioridade para **mobilizar recursos nas áreas de maior risco** |
 
-> ⚠️ **Dados simulados.** As ocorrências dos bombeiros e a previsão de chuva da Defesa Civil são fictícias, apenas para demonstração.
+> ⚠️ **Dados simulados.** As ocorrências do CBMMG e a previsão de chuva da Defesa Civil de MG são fictícias, apenas para demonstração.
+
+**Área coberta:** somente Minas Gerais. São 12 locais em 6 regiões: Serra do Espinhaço, Alto Jequitinhonha, Oeste/Canastra, Zona da Mata, Sul de Minas e Região Metropolitana de BH. A lista está em [`src/shared/data/trilhas.js`](src/shared/data/trilhas.js).
 
 ## Como funciona
 
 ### Risco de cabeça d'água
 O risco cruza duas fontes:
-- **Bombeiros**: número de ocorrências no local nos últimos 5 anos, que mostra o quanto o local é propenso;
-- **Defesa Civil**: probabilidade de chuva no dia, que é o gatilho.
+- **CBMMG**: número de ocorrências no local nos últimos 5 anos, que mostra o quanto o local é propenso;
+- **Defesa Civil de MG**: probabilidade de chuva na região no dia, que é o gatilho.
 
 ```
 risco = 15% × histórico + 85% × chuva × (0,3 + 0,7 × histórico)
@@ -40,7 +42,7 @@ O código está em [`src/shared/risco.js`](src/shared/risco.js). Os dados simula
 7. A aba **"Picada de cobra"** está marcada como **EM BREVE**.
 
 ### Painel dos bombeiros
-- Cadastro do profissional (nome, corporação, matrícula, unidade).
+- Cadastro do profissional do CBMMG (nome, matrícula, unidade).
 - Faixa explicando o **objetivo: facilitar a mobilização de recursos para as áreas mais arriscadas**.
 - Indicadores: pessoas cadastradas, pessoas em área crítica, vulneráveis e potenciais vítimas.
 - **Mapa**: o tamanho do círculo mostra o nº de pessoas e a cor mostra o risco. As áreas críticas pulsam.
@@ -92,7 +94,7 @@ Para testar online no computador, copie `.env.example` para `.env.local`, preenc
 
 ### Roteiro sugerido para a apresentação
 1. Abra o **painel dos bombeiros** no notebook ou telão e clique em **"Carregar dados de exemplo"**.
-2. No celular, abra o **app do turista**, escolha **Vale da Lua**, que sempre fica com risco crítico na demonstração, e clique em **Confirmar este local**.
+2. No celular, abra o **app do turista**, escolha **Cachoeira Grande – Serra do Cipó**, que sempre fica com risco crítico na demonstração, e clique em **Confirmar este local**.
 3. Responda **"Sim, assumo o risco"**: o alerta de **potencial vítima** aparece na hora no painel.
 4. Preencha o grupo, por exemplo com uma criança que não sabe nadar. O painel atualiza os números de vulneráveis.
 
