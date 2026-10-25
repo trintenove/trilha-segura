@@ -383,6 +383,10 @@ a {
   font-family: var(--fonte);
 }
 
+.mapa.leaflet-container {
+  background: #e8ecee; /* aparece enquanto o mapa de fundo carrega */
+}
+
 .ponto-critico {
   animation: pulso 1.6s ease-in-out infinite;
 }

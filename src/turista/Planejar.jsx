@@ -5,7 +5,7 @@
 //  3. reserva: dados do grupo (pessoas, idades, quem não sabe nadar);
 //  4. concluído.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icone from '../shared/componentes/Icone.jsx';
 import { MedidorRisco } from '../shared/componentes/Risco.jsx';
 import { exigeAlertaBombeiros, LIMIAR_ALERTA_BOMBEIROS } from '../shared/risco.js';
@@ -26,6 +26,10 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
 
   const [responsavel, setResponsavel] = useState(perfil);
   const [pessoas, setPessoas] = useState([novaPessoa()]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [etapa]);
 
   const dia = trilha.previsao.find((d) => d.data === data) ?? trilha.hoje;
   const risco = dia.risco;

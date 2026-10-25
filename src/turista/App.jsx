@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Marca from '../shared/componentes/Marca.jsx';
 import Icone from '../shared/componentes/Icone.jsx';
 import { Carregando, ModoConexao } from '../shared/componentes/Comuns.jsx';
@@ -25,6 +25,11 @@ export default function App() {
   const [aba, setAba] = useState('trilhas');
   // Tela aberta por cima das abas: detalhe de uma trilha ou planejamento da viagem.
   const [tela, setTela] = useState(null);
+
+  // Cada troca de tela começa do topo.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [aba, tela]);
 
   const salvarPerfil = (novo) => {
     gravarLocal(CHAVE_PERFIL, novo);

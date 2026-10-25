@@ -1,27 +1,20 @@
 import { useEffect } from 'react';
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import { CircleMarker, MapContainer, Polygon, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { nivelDoRisco } from '../risco.js';
+import { CONTORNO_MG } from '../data/contornoMG.js';
 
 const CENTRO_MINAS = [-19.8, -44.6];
 
-// Ajusta o enquadramento para mostrar todos os pontos, ou voa até o selecionado.
+// Mostra o estado de Minas inteiro, ou voa até o ponto selecionado.
 function Enquadrar({ pontos, selecionado }) {
   const mapa = useMap();
-  const chave = pontos.map((p) => p.id).join('|');
-
-  useEffect(() => {
-    if (pontos.length === 0) return;
-    mapa.fitBounds(
-      pontos.map((p) => [p.lat, p.lng]),
-      // Sem animação: evita erro do Leaflet se a tela for trocada no meio dela.
-      { padding: [36, 36], maxZoom: 8, animate: false },
-    );
-  }, [chave]);
 
   useEffect(() => {
     const alvo = pontos.find((p) => p.id === selecionado);
     if (alvo) mapa.flyTo([alvo.lat, alvo.lng], 9, { duration: 0.8 });
+    // Sem animação: evita erro do Leaflet se a tela for trocada no meio dela.
+    else mapa.fitBounds(CONTORNO_MG, { padding: [10, 10], animate: false });
   }, [selecionado]);
 
   return null;
@@ -37,6 +30,12 @@ export default function MapaRisco({ pontos, selecionado, aoSelecionar, altura })
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
         url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+      />
+      {/* Área atendida pelo app: o estado de Minas Gerais. */}
+      <Polygon
+        positions={CONTORNO_MG}
+        interactive={false}
+        pathOptions={{ color: '#c8102e', weight: 2, dashArray: '6 5', fillColor: '#c8102e', fillOpacity: 0.04 }}
       />
       <Enquadrar pontos={pontos} selecionado={selecionado} />
       {ordenados.map((ponto) => {
