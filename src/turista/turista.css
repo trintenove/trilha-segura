@@ -264,19 +264,39 @@ h2 {
 
 .pessoa {
   display: grid;
-  grid-template-columns: 1fr 92px auto;
-  gap: 8px;
+  grid-template-columns: 1fr auto;
   align-items: center;
+  gap: 8px;
   padding-top: 10px;
   border-top: 1px solid var(--borda);
 }
 
 .pessoa__nome {
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.pessoa .entrada {
-  padding: 9px 10px;
+.pessoa__nada {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pessoa__faixa {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.pessoa .alternador button {
+  padding: 8px 12px;
+}
+
+/* Escolhas que pedem atenção (criança, idoso, não nada) ficam em amarelo. */
+.alternador button.atencao[aria-pressed='true'] {
+  background: #fff4cc;
+  color: #6b4e00;
 }
 
 .resumo-grupo {

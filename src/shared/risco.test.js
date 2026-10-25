@@ -47,16 +47,16 @@ describe('agregação para os bombeiros', () => {
     previsao: riscos.map((risco, i) => ({ data: `2026-01-0${i + 1}`, risco })),
   });
   const trilhas = [trilha('a', [40, 90]), trilha('b', [70, 70]), trilha('c', [95, 95])];
-  const pessoa = (idade, sabeNadar = true) => ({ idade, sabeNadar });
+  const pessoa = (faixa, sabeNadar = true) => ({ faixa, sabeNadar });
   const viagens = [
-    { trilhaId: 'a', data: '2026-01-01', pessoas: [pessoa(30), pessoa(8, false)], sinalizadaBombeiros: false },
-    { trilhaId: 'a', data: '2026-01-02', pessoas: [pessoa(65)], sinalizadaBombeiros: true },
+    { trilhaId: 'a', data: '2026-01-01', pessoas: [pessoa('adulto'), pessoa('crianca', false)], sinalizadaBombeiros: false },
+    { trilhaId: 'a', data: '2026-01-02', pessoas: [pessoa('idoso')], sinalizadaBombeiros: true },
     { trilhaId: 'a', data: '2026-01-02', status: 'alerta', pessoas: [], sinalizadaBombeiros: true },
-    { trilhaId: 'b', data: '2026-01-01', pessoas: [pessoa(20), pessoa(22, false), pessoa(70)], sinalizadaBombeiros: false },
+    { trilhaId: 'b', data: '2026-01-01', pessoas: [pessoa('adulto'), pessoa('adulto', false), pessoa('idoso')], sinalizadaBombeiros: false },
   ];
 
   it('conta pessoas vulneráveis sem contar a mesma pessoa duas vezes', () => {
-    expect(resumirPessoas([pessoa(8, false), pessoa(65), pessoa(30)])).toEqual({
+    expect(resumirPessoas([pessoa('crianca', false), pessoa('idoso'), pessoa('adulto')])).toEqual({
       total: 3, criancas: 1, idosos: 1, naoNadam: 1, vulneraveis: 2,
     });
   });

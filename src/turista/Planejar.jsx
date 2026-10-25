@@ -2,7 +2,7 @@
 //  1. confirmar local e data (vendo o risco);
 //  2. se o risco passar de 80%: "Você tem certeza?". Se o turista assumir o
 //     risco, os bombeiros recebem NA HORA o alerta de potencial vítima;
-//  3. reserva: dados do grupo (pessoas, idades, quem não sabe nadar);
+//  3. reserva: dados do grupo (pessoas, adulto/criança/idoso, quem não sabe nadar);
 //  4. concluído.
 
 import { useEffect, useState } from 'react';
@@ -10,11 +10,11 @@ import Icone from '../shared/componentes/Icone.jsx';
 import { MedidorRisco } from '../shared/componentes/Risco.jsx';
 import { exigeAlertaBombeiros, LIMIAR_ALERTA_BOMBEIROS } from '../shared/risco.js';
 import { formatarDataLonga } from '../shared/datas.js';
-import { concluirReserva, registrarPotencialVitima, resumirPessoas } from '../shared/viagens.js';
+import { concluirReserva, FAIXAS, registrarPotencialVitima, resumirPessoas } from '../shared/viagens.js';
 import { SeletorDeDia } from './DetalheTrilha.jsx';
 
 const MAX_PESSOAS = 30;
-const novaPessoa = () => ({ idade: '', sabeNadar: true });
+const novaPessoa = () => ({ faixa: 'adulto', sabeNadar: true });
 
 export default function Planejar({ trilha, dataInicial, viagemId: viagemExistente, perfil, aoVoltar, aoConcluir }) {
   const [etapa, setEtapa] = useState(viagemExistente ? 'reserva' : 'local');
@@ -61,8 +61,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
       setEtapa('reserva');
     });
 
-  const pessoasValidas = pessoas.every((p) => p.idade !== '' && Number(p.idade) >= 0 && Number(p.idade) <= 110);
-  const formularioValido = pessoasValidas && responsavel.nome.trim() && responsavel.telefone.trim();
+  const formularioValido = responsavel.nome.trim() && responsavel.telefone.trim();
 
   const enviarReserva = (evento) => {
     evento.preventDefault();
@@ -74,7 +73,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
         data,
         risco,
         responsavel,
-        pessoas: pessoas.map((p) => ({ idade: Number(p.idade), sabeNadar: p.sabeNadar })),
+        pessoas,
       });
       setEtapa('concluido');
     });
@@ -87,7 +86,7 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
 
   const alterarPessoa = (indice, campos) => setPessoas((atual) => atual.map((p, i) => (i === indice ? { ...p, ...campos } : p)));
 
-  const resumo = resumirPessoas(pessoas.filter((p) => p.idade !== '').map((p) => ({ ...p, idade: Number(p.idade) })));
+  const resumo = resumirPessoas(pessoas);
 
   if (etapa === 'concluido') {
     return <Concluido trilha={trilha} data={data} sinalizada={alertaEnviado || exigeAlertaBombeiros(risco)} aoContinuar={aoConcluir} />;
@@ -173,32 +172,38 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
               </div>
             </div>
 
-            {pessoas.map((pessoa, i) => (
-              <div key={i} className="pessoa">
-                <span className="pessoa__nome">{i === 0 ? 'Você' : `Pessoa ${i + 1}`}</span>
-                <label className="pessoa__idade">
-                  <input
-                    className="entrada"
-                    type="number"
-                    min="0"
-                    max="110"
-                    inputMode="numeric"
-                    placeholder="Idade"
-                    value={pessoa.idade}
-                    onChange={(e) => alterarPessoa(i, { idade: e.target.value })}
-                    aria-label={`Idade de ${i === 0 ? 'você' : `pessoa ${i + 1}`}`}
-                  />
-                </label>
-                <div className="alternador" role="group" aria-label="Sabe nadar?">
-                  <button type="button" aria-pressed={pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: true })}>
-                    Nada
-                  </button>
-                  <button type="button" aria-pressed={!pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: false })}>
-                    Não nada
-                  </button>
+            {pessoas.map((pessoa, i) => {
+              const nome = i === 0 ? 'Você' : `Pessoa ${i + 1}`;
+              return (
+                <div key={i} className="pessoa">
+                  <span className="pessoa__nome">{nome}</span>
+                  <div className="pessoa__nada">
+                    <span>Nada?</span>
+                    <div className="alternador" role="group" aria-label={`${nome} sabe nadar?`}>
+                      <button type="button" aria-pressed={pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: true })}>
+                        Sim
+                      </button>
+                      <button type="button" className="atencao" aria-pressed={!pessoa.sabeNadar} onClick={() => alterarPessoa(i, { sabeNadar: false })}>
+                        Não
+                      </button>
+                    </div>
+                  </div>
+                  <div className="alternador pessoa__faixa" role="group" aria-label={`${nome}: adulto, criança ou idoso`}>
+                    {FAIXAS.map((faixa) => (
+                      <button
+                        key={faixa.id}
+                        type="button"
+                        className={faixa.id !== 'adulto' ? 'atencao' : undefined}
+                        aria-pressed={pessoa.faixa === faixa.id}
+                        onClick={() => alterarPessoa(i, { faixa: faixa.id })}
+                      >
+                        {faixa.rotulo}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="resumo-grupo">
               <span className={resumo.criancas ? 'ativo' : ''}>
@@ -217,7 +222,6 @@ export default function Planejar({ trilha, dataInicial, viagemId: viagemExistent
           <button className="botao botao--largo" disabled={!formularioValido || enviando}>
             {enviando ? 'Enviando…' : 'Confirmar reserva'}
           </button>
-          {!pessoasValidas && <p className="pequeno suave" style={{ margin: 0, textAlign: 'center' }}>Informe a idade de todas as pessoas.</p>}
           {alertaEnviado && (
             <button type="button" className="botao botao--secundario botao--largo" onClick={aoConcluir}>
               Completar depois

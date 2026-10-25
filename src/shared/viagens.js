@@ -21,16 +21,22 @@ const CHAVE_SUPABASE = import.meta.env.VITE_SUPABASE_KEY;
 export const armazenamento =
   URL_SUPABASE && CHAVE_SUPABASE ? criarArmazenamentoSupabase(URL_SUPABASE, CHAVE_SUPABASE) : armazenamentoLocal;
 
-export const IDADE_CRIANCA = 12; // menores de 12 anos (ECA)
-export const IDADE_IDOSO = 60; // 60 anos ou mais (Estatuto da Pessoa Idosa)
+// Faixa etária de cada pessoa do grupo, escolhida com um toque.
+export const FAIXAS = [
+  { id: 'crianca', rotulo: 'Criança' }, // até 11 anos (ECA)
+  { id: 'adulto', rotulo: 'Adulto' },
+  { id: 'idoso', rotulo: 'Idoso' }, // 60 anos ou mais (Estatuto da Pessoa Idosa)
+];
+
+const vulneravel = (p) => p.faixa !== 'adulto' || !p.sabeNadar;
 
 export function resumirPessoas(pessoas) {
   return {
     total: pessoas.length,
-    criancas: pessoas.filter((p) => p.idade < IDADE_CRIANCA).length,
-    idosos: pessoas.filter((p) => p.idade >= IDADE_IDOSO).length,
+    criancas: pessoas.filter((p) => p.faixa === 'crianca').length,
+    idosos: pessoas.filter((p) => p.faixa === 'idoso').length,
     naoNadam: pessoas.filter((p) => !p.sabeNadar).length,
-    vulneraveis: pessoas.filter((p) => p.idade < IDADE_CRIANCA || p.idade >= IDADE_IDOSO || !p.sabeNadar).length,
+    vulneraveis: pessoas.filter(vulneravel).length,
   };
 }
 
@@ -117,9 +123,9 @@ export function criarViagensExemplo(trilhas, semente = hojeISO()) {
     const trilha = trilhas[inteiro(0, trilhas.length - 1)];
     const dia = trilha.previsao[inteiro(0, Math.min(4, trilha.previsao.length - 1))];
     const pessoas = Array.from({ length: inteiro(1, 6) }, () => {
-      const faixa = sorteio();
-      const idade = faixa < 0.2 ? inteiro(2, 11) : faixa < 0.85 ? inteiro(14, 59) : inteiro(60, 78);
-      return { idade, sabeNadar: sorteio() > (idade < IDADE_CRIANCA ? 0.5 : 0.18) };
+      const sorteada = sorteio();
+      const faixa = sorteada < 0.2 ? 'crianca' : sorteada < 0.85 ? 'adulto' : 'idoso';
+      return { faixa, sabeNadar: sorteio() > (faixa === 'crianca' ? 0.5 : 0.18) };
     });
     const risco = calcularRisco({ ocorrencias: trilha.ocorrencias, probChuva: dia.probChuva });
     return {

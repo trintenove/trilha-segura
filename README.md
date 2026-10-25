@@ -38,7 +38,7 @@ O código está em [`src/shared/risco.js`](src/shared/risco.js). Os dados simula
 3. Abre uma trilha e vê o risco dos próximos 7 dias e de onde ele vem.
 4. **Confirma o local e a data.** Se o risco passar de 80%, o app pergunta: *"Você tem certeza que quer selecionar esse lugar?"*
 5. Se ele assumir o risco, os dados são **enviados imediatamente aos bombeiros como "potencial vítima"**.
-6. Preenche a **reserva**: responsável e cada pessoa do grupo, com idade e se sabe nadar. Daí saem crianças (< 12 anos), idosos (60+) e quem não nada.
+6. Preenche a **reserva**: responsável e, para cada pessoa do grupo, dois toques: **Adulto / Criança / Idoso** e **Nada? Sim / Não**. Daí saem crianças, idosos e quem não nada.
 7. A aba **"Picada de cobra"** está marcada como **EM BREVE**.
 
 ### Painel dos bombeiros
