@@ -1,10 +1,19 @@
 import { useEffect } from 'react';
-import { CircleMarker, MapContainer, Polygon, TileLayer, Tooltip, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { CircleMarker, MapContainer, Marker, Polygon, TileLayer, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { nivelDoRisco } from '../risco.js';
 import { CONTORNO_MG } from '../data/contornoMG.js';
 
 const CENTRO_MINAS = [-19.8, -44.6];
+
+// Marcador das denúncias de cabeça d'água ("!" amarelo pulsando).
+const ICONE_DENUNCIA = L.divIcon({
+  className: 'marcador-denuncia',
+  html: '<span>!</span>',
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+});
 
 // Mostra o estado de Minas inteiro, ou voa até o ponto selecionado.
 function Enquadrar({ pontos, selecionado }) {
@@ -21,7 +30,8 @@ function Enquadrar({ pontos, selecionado }) {
 }
 
 // pontos: [{ id, lat, lng, risco, raio, titulo, detalhe }]
-export default function MapaRisco({ pontos, selecionado, aoSelecionar, altura }) {
+// denuncias: [{ id, lat, lng, titulo, detalhe }]
+export default function MapaRisco({ pontos, denuncias = [], selecionado, aoSelecionar, altura }) {
   // Os pontos mais arriscados são desenhados por último, ficando por cima.
   const ordenados = [...pontos].sort((a, b) => a.risco - b.risco);
 
@@ -37,7 +47,7 @@ export default function MapaRisco({ pontos, selecionado, aoSelecionar, altura })
         interactive={false}
         pathOptions={{ color: '#c8102e', weight: 2, dashArray: '6 5', fillColor: '#c8102e', fillOpacity: 0.04 }}
       />
-      <Enquadrar pontos={pontos} selecionado={selecionado} />
+      <Enquadrar pontos={[...pontos, ...denuncias]} selecionado={selecionado} />
       {ordenados.map((ponto) => {
         const nivel = nivelDoRisco(ponto.risco);
         const critico = nivel.id === 'critico';
@@ -69,6 +79,15 @@ export default function MapaRisco({ pontos, selecionado, aoSelecionar, altura })
           </CircleMarker>
         );
       })}
+      {denuncias.map((denuncia) => (
+        <Marker key={denuncia.id} position={[denuncia.lat, denuncia.lng]} icon={ICONE_DENUNCIA} zIndexOffset={1000}>
+          <Tooltip direction="top" offset={[0, -14]}>
+            <strong>{denuncia.titulo}</strong>
+            <br />
+            {denuncia.detalhe}
+          </Tooltip>
+        </Marker>
+      ))}
     </MapContainer>
   );
 }

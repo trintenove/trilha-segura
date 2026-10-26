@@ -33,3 +33,11 @@ export function formatarDataLonga(iso) {
 export function formatarHora(data) {
   return data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
+
+export function tempoDecorrido(isoDataHora, agora = new Date()) {
+  const minutos = Math.max(0, Math.round((agora - new Date(isoDataHora)) / 60000));
+  if (minutos < 1) return 'agora';
+  if (minutos < 60) return `há ${minutos} min`;
+  const horas = Math.round(minutos / 60);
+  return horas < 24 ? `há ${horas} h` : `há ${Math.round(horas / 24)} dia(s)`;
+}

@@ -1,19 +1,21 @@
-// Agrupa as viagens cadastradas por localidade para o painel dos bombeiros.
+// Agrupa viagens cadastradas e denúncias abertas por localidade para o painel dos bombeiros.
 
 import { diaDaPrevisao } from './data/useDadosRisco.js';
 import { nivelDoRisco } from './risco.js';
 import { resumirPessoas } from './viagens.js';
 
-export function agregarPorLocalidade(trilhas, viagens, { de, ate }) {
+export function agregarPorLocalidade(trilhas, viagens, { de, ate }, denuncias = []) {
   const localidades = [];
 
   for (const trilha of trilhas) {
     const doLocal = viagens.filter((v) => v.trilhaId === trilha.id && v.data >= de && v.data <= ate);
-    if (doLocal.length === 0) continue;
+    const denunciasDoLocal = denuncias.filter((d) => d.trilhaId === trilha.id && d.status === 'aberta');
+    if (doLocal.length === 0 && denunciasDoLocal.length === 0) continue;
 
-    // O risco da localidade é o pior risco entre os dias com visitantes no período.
+    // O risco da localidade é o pior risco entre os dias com visitantes no período
+    // (sem visitantes, vale o risco de hoje).
     const viagensComRisco = doLocal.map((v) => ({ ...v, risco: diaDaPrevisao(trilha, v.data)?.risco ?? v.riscoNoCadastro }));
-    const risco = Math.max(...viagensComRisco.map((v) => v.risco));
+    const risco = Math.max(trilha.hoje?.risco ?? 0, ...viagensComRisco.map((v) => v.risco));
     const pessoas = resumirPessoas(doLocal.flatMap((v) => v.pessoas));
 
     localidades.push({
@@ -25,15 +27,17 @@ export function agregarPorLocalidade(trilhas, viagens, { de, ate }) {
       sinalizadas: doLocal.filter((v) => v.sinalizadaBombeiros).length,
       // Assumiram o risco, mas ainda não informaram quem está no grupo.
       gruposNaoInformados: doLocal.filter((v) => v.status === 'alerta').length,
+      denuncias: denunciasDoLocal.length,
     });
   }
 
   return localidades.sort(compararPrioridade);
 }
 
-// Maior risco primeiro; empate → mais pessoas vulneráveis → mais pessoas.
+// Denúncia de cabeça d'água em andamento vem antes de tudo; depois, maior
+// risco → mais pessoas vulneráveis → mais pessoas.
 export function compararPrioridade(a, b) {
-  return b.risco - a.risco || b.vulneraveis - a.vulneraveis || b.total - a.total;
+  return b.denuncias - a.denuncias || b.risco - a.risco || b.vulneraveis - a.vulneraveis || b.total - a.total;
 }
 
 export function totalizar(localidades) {
@@ -50,5 +54,6 @@ export function totalizar(localidades) {
     vulneraveis: soma('vulneraveis'),
     sinalizadas: soma('sinalizadas'),
     gruposNaoInformados: soma('gruposNaoInformados'),
+    denuncias: soma('denuncias'),
   };
 }

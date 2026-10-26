@@ -39,7 +39,14 @@ O código está em [`src/shared/risco.js`](src/shared/risco.js). Os dados simula
 4. **Confirma o local e a data.** Se o risco passar de 80%, o app pergunta: *"Você tem certeza que quer selecionar esse lugar?"*
 5. Se ele assumir o risco, os dados são **enviados imediatamente aos bombeiros como "potencial vítima"**.
 6. Preenche a **reserva** como um carrinho de compras: botões **+ / −** para adultos, crianças e idosos que nadam ou não nadam (ex.: 2 adultos que nadam, 2 que não nadam, 1 criança que nada e 2 que não nadam).
-7. A aba **"Picada de cobra"** está marcada como **EM BREVE**.
+7. A aba **Denunciar**, em vermelho, serve para avisar os bombeiros de uma **cabeça d'água acontecendo agora**:
+   - botão para ligar 193;
+   - local pelo GPS ou pela lista de trilhas;
+   - sinais vistos: água subiu, água barrenta, galhos descendo, barulho, chuva rio acima;
+   - se há gente em perigo e detalhes.
+
+   Quem abre a trilha também vê o aviso "Cabeça d'água denunciada há X min".
+8. A aba **"Picada de cobra"** está marcada como **EM BREVE**.
 
 ### Painel dos bombeiros
 - Cadastro do profissional do CBMMG (nome, matrícula, unidade).
@@ -47,7 +54,8 @@ O código está em [`src/shared/risco.js`](src/shared/risco.js). Os dados simula
 - Indicadores: pessoas cadastradas, pessoas em área crítica, vulneráveis e potenciais vítimas.
 - **Mapa**: o tamanho do círculo mostra o nº de pessoas e a cor mostra o risco. As áreas críticas pulsam.
 - **Lista de prioridade** ordenada pelo risco, com pessoas, crianças, idosos e quem não sabe nadar em cada local.
-- **Alerta ao vivo**, com som e vibração, quando um turista assume um risco acima de 80%.
+- **Alerta ao vivo**, com som e vibração, quando um turista assume um risco acima de 80% ou faz uma **denúncia de cabeça d'água**.
+- **Denúncias em aberto**: cada uma mostra local, sinais, se há pessoas em perigo e o contato de quem denunciou. O local denunciado vai para o **topo da prioridade** e ganha um marcador "!" no mapa. Ao clicar em "Marcar como atendida", a denúncia sai da lista.
 - Botão para carregar e remover **dados de exemplo** na apresentação.
 
 ## Rodando no seu computador
@@ -97,6 +105,7 @@ Para testar online no computador, copie `.env.example` para `.env.local`, preenc
 2. No celular, abra o **app do turista**, escolha **Cachoeira Grande – Serra do Cipó**, que sempre fica com risco crítico na demonstração, e clique em **Confirmar este local**.
 3. Responda **"Sim, assumo o risco"**: o alerta de **potencial vítima** aparece na hora no painel.
 4. Preencha o grupo, por exemplo com uma criança que não sabe nadar. O painel atualiza os números de vulneráveis.
+5. No celular, vá na aba **Denunciar**, use a localização, marque os sinais e envie. A denúncia aparece na hora no painel, no topo da prioridade.
 
 ## Estrutura
 
@@ -109,6 +118,7 @@ src/
     risco.js            cálculo e níveis de risco
     agregacao.js        resumo por localidade para os bombeiros
     viagens.js          cadastro das viagens e alertas
+    denuncias.js        denúncias de cabeça d'água
     armazenamento/      modo local (navegador) e online (Supabase)
     data/               trilhas e fontes simuladas (Bombeiros e Defesa Civil)
     componentes/        mapa, medidor de risco, ícones, logotipo

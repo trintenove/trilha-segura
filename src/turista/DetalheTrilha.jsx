@@ -3,7 +3,7 @@ import Icone from '../shared/componentes/Icone.jsx';
 import MapaRisco from '../shared/componentes/MapaRisco.jsx';
 import { MedidorRisco } from '../shared/componentes/Risco.jsx';
 import { nivelDoRisco, rotuloHistorico } from '../shared/risco.js';
-import { formatarData } from '../shared/datas.js';
+import { formatarData, tempoDecorrido } from '../shared/datas.js';
 
 export function SeletorDeDia({ previsao, data, aoEscolher }) {
   return (
@@ -24,7 +24,7 @@ export function SeletorDeDia({ previsao, data, aoEscolher }) {
   );
 }
 
-export default function DetalheTrilha({ trilha, aoVoltar, aoPlanejar }) {
+export default function DetalheTrilha({ trilha, denuncias, aoVoltar, aoPlanejar, aoDenunciar }) {
   const [data, setData] = useState(trilha.hoje.data);
   const dia = trilha.previsao.find((d) => d.data === data);
   const nivel = nivelDoRisco(dia.risco);
@@ -41,6 +41,15 @@ export default function DetalheTrilha({ trilha, aoVoltar, aoPlanejar }) {
           {trilha.cidade} · {trilha.tipo}
         </div>
       </div>
+
+      {denuncias.length > 0 && (
+        <div className="faixa-alerta faixa-alerta--forte">
+          <Icone nome="sirene" />
+          <span>
+            <strong>Cabeça d'água denunciada {tempoDecorrido(denuncias.at(-1).criadaEm)}</strong> por quem está no local. Não entre na água.
+          </span>
+        </div>
+      )}
 
       <div className="cartao" style={{ display: 'grid', gap: 14 }}>
         <MedidorRisco risco={dia.risco} />
@@ -81,6 +90,10 @@ export default function DetalheTrilha({ trilha, aoVoltar, aoPlanejar }) {
       </details>
 
       <MapaRisco altura={200} pontos={[{ id: trilha.id, lat: trilha.lat, lng: trilha.lng, risco: dia.risco, titulo: trilha.nome }]} />
+
+      <button className="botao botao--secundario botao--largo" onClick={aoDenunciar}>
+        <Icone nome="alerta" /> Denunciar cabeça d'água neste local
+      </button>
 
       <div className="rodape-fixo">
         <button className="botao botao--largo" onClick={() => aoPlanejar(data)}>

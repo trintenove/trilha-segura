@@ -31,7 +31,7 @@ h2 {
   width: 100%;
   max-width: 560px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   background: var(--grafite);
   padding-bottom: env(safe-area-inset-bottom);
   z-index: 1000;
@@ -57,17 +57,26 @@ h2 {
   border-top-color: var(--amarelo);
 }
 
+.abas__item--destaque {
+  color: #fff;
+  background: var(--vermelho);
+}
+
+.abas__item--destaque[aria-current='page'] {
+  background: var(--vermelho-escuro);
+}
+
 .abas__em-breve {
   position: absolute;
   top: 4px;
-  right: 50%;
-  transform: translateX(28px);
+  right: 4px;
   background: var(--amarelo);
   color: var(--grafite);
   font-style: normal;
-  font-size: 0.58rem;
+  font-size: 0.55rem;
   font-weight: 800;
   text-transform: uppercase;
+  white-space: nowrap;
   padding: 1px 5px;
   border-radius: 999px;
 }
@@ -388,4 +397,51 @@ h2 {
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.8rem;
+}
+
+/* ---- Denúncia ----------------------------------------------------------- */
+
+.selo-denuncia {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--risco-critico);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.ligar-193 {
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.sinais {
+  display: grid;
+  gap: 8px;
+}
+
+.sinais button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda);
+  background: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sinais button[aria-pressed='true'] {
+  border-color: var(--risco-critico);
+  background: #fde8ea;
+  color: #7d0b18;
+}
+
+textarea.entrada {
+  resize: vertical;
 }

@@ -1,5 +1,5 @@
 import Icone from './Icone.jsx';
-import { armazenamento } from '../viagens.js';
+import { MODO } from '../armazenamento/index.js';
 
 export function Carregando({ texto = 'Carregando dados…' }) {
   return (
@@ -20,7 +20,7 @@ export function AvisoProvaDeConceito() {
 
 // Mostra se os dados estão indo para o servidor (online) ou só neste navegador.
 export function ModoConexao() {
-  const online = armazenamento.modo === 'online';
+  const online = MODO === 'online';
   return (
     <span
       className="pequeno linha"

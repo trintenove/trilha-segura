@@ -334,3 +334,92 @@ h2 {
     animation: none;
   }
 }
+
+/* ---- Denúncias ---------------------------------------------------------- */
+
+.denuncias {
+  background: var(--grafite);
+  color: #fff;
+  border-radius: var(--raio);
+  padding: 14px 16px;
+  border: 3px solid var(--amarelo);
+  display: grid;
+  gap: 12px;
+}
+
+.denuncias__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--amarelo);
+}
+
+.denuncias__titulo h2 {
+  color: #fff;
+}
+
+.denuncias__contagem {
+  background: var(--amarelo);
+  color: var(--grafite);
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 999px;
+  min-width: 32px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.denuncias ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 10px;
+}
+
+.denuncia {
+  background: #fff;
+  color: var(--texto);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.denuncia__perigo {
+  background: var(--risco-critico);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.denuncia .botao {
+  white-space: nowrap;
+}
+
+.denuncia__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.denuncia__obs {
+  font-style: italic;
+}
+
+.localidade__alerta--denuncia {
+  background: var(--grafite);
+  color: var(--amarelo);
+}
+
+.alerta-ao-vivo--denuncia {
+  background: var(--grafite);
+}

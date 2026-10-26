@@ -4,8 +4,9 @@ import MapaRisco from '../shared/componentes/MapaRisco.jsx';
 import { LegendaRisco, SeloRisco } from '../shared/componentes/Risco.jsx';
 import { AvisoProvaDeConceito, Carregando } from '../shared/componentes/Comuns.jsx';
 import { agregarPorLocalidade, totalizar } from '../shared/agregacao.js';
-import { formatarData, hojeISO, somarDias } from '../shared/datas.js';
+import { formatarData, hojeISO, somarDias, tempoDecorrido } from '../shared/datas.js';
 import { carregarExemplos, removerExemplos, resumirPessoas, useViagens } from '../shared/viagens.js';
+import { denunciasAbertas, marcarAtendida, rotuloSinal, useDenuncias } from '../shared/denuncias.js';
 
 const PERIODOS = [
   { dias: 1, rotulo: 'Hoje' },
@@ -43,47 +44,65 @@ function tocarSirene() {
   navigator.vibrate?.([300, 100, 300]);
 }
 
-// Detecta potenciais vítimas que chegaram depois que o painel foi aberto.
-function useNovosAlertas(viagens, carregando) {
+// Detecta registros que chegaram depois que o painel foi aberto
+// (potenciais vítimas e denúncias), para avisar com som e destaque.
+function useNovos(registros, carregando, interessa) {
   const conhecidos = useRef(null);
   const [novos, setNovos] = useState([]);
 
   useEffect(() => {
     if (carregando) return;
-    const sinalizadas = viagens.filter((v) => v.sinalizadaBombeiros && !v.demo);
+    const relevantes = registros.filter(interessa);
     if (conhecidos.current === null) {
-      conhecidos.current = new Set(sinalizadas.map((v) => v.id));
+      conhecidos.current = new Set(relevantes.map((r) => r.id));
       return;
     }
-    const chegaram = sinalizadas.filter((v) => !conhecidos.current.has(v.id));
+    const chegaram = relevantes.filter((r) => !conhecidos.current.has(r.id));
     if (chegaram.length === 0) return;
-    chegaram.forEach((v) => conhecidos.current.add(v.id));
+    chegaram.forEach((r) => conhecidos.current.add(r.id));
     setNovos((atuais) => [...chegaram, ...atuais]);
     tocarSirene();
-  }, [viagens, carregando]);
+  }, [registros, carregando]);
 
-  const dispensar = (id) => setNovos((atuais) => atuais.filter((v) => v.id !== id));
+  const dispensar = (id) => setNovos((atuais) => atuais.filter((r) => r.id !== id));
   return [novos, dispensar];
 }
 
+const ehPotencialVitima = (viagem) => viagem.sinalizadaBombeiros && !viagem.demo;
+const ehDenunciaAberta = (denuncia) => denuncia.status === 'aberta';
+
+// Onde mostrar a denúncia no mapa: coordenadas do aparelho ou, sem elas, a trilha.
+const posicaoDaDenuncia = (denuncia, trilha) => (denuncia.lat != null ? { lat: denuncia.lat, lng: denuncia.lng } : trilha && { lat: trilha.lat, lng: trilha.lng });
+
 export default function Painel({ trilhas }) {
   const { viagens, carregando, erro } = useViagens();
+  const { denuncias, carregando: carregandoDenuncias } = useDenuncias();
+  const abertas = denunciasAbertas(denuncias);
   const [periodo, setPeriodo] = useState(1);
   const [selecionado, setSelecionado] = useState(null);
   const [processando, setProcessando] = useState(false);
-  const [novosAlertas, dispensarAlerta] = useNovosAlertas(viagens, carregando);
+  const [novosAlertas, dispensarAlerta] = useNovos(viagens, carregando, ehPotencialVitima);
+  const [novasDenuncias, dispensarDenuncia] = useNovos(denuncias, carregandoDenuncias, ehDenunciaAberta);
   const itensLista = useRef({});
 
   const hoje = hojeISO();
   const ate = somarDias(hoje, periodo - 1);
-  const localidades = useMemo(() => agregarPorLocalidade(trilhas, viagens, { de: hoje, ate }), [trilhas, viagens, hoje, ate]);
+  const localidades = useMemo(() => agregarPorLocalidade(trilhas, viagens, { de: hoje, ate }, denuncias), [trilhas, viagens, hoje, ate, denuncias]);
   const totais = totalizar(localidades);
   const temExemplos = viagens.some((v) => v.demo);
 
-  const selecionar = (trilhaId) => {
-    setSelecionado(trilhaId);
-    itensLista.current[trilhaId]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  const selecionar = (id) => {
+    setSelecionado(id);
+    itensLista.current[id]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
+
+  const marcadoresDenuncia = abertas
+    .map((d) => {
+      const trilha = trilhas.find((t) => t.id === d.trilhaId);
+      const posicao = posicaoDaDenuncia(d, trilha);
+      return posicao && { id: `denuncia-${d.id}`, ...posicao, titulo: `Denúncia: ${trilha?.nome ?? 'local informado por GPS'}`, detalhe: tempoDecorrido(d.criadaEm) };
+    })
+    .filter(Boolean);
 
   const comExemplos = (acao) => async () => {
     setProcessando(true);
@@ -104,6 +123,8 @@ export default function Painel({ trilhas }) {
       <Objetivo />
 
       {erro && <div className="aviso-poc">Erro ao ler o banco de dados: {erro.message}</div>}
+
+      {abertas.length > 0 && <DenunciasAbertas denuncias={abertas} trilhas={trilhas} aoVer={selecionar} />}
 
       <div className="painel__barra">
         <div className="alternador" role="group" aria-label="Período">
@@ -164,6 +185,7 @@ export default function Painel({ trilhas }) {
             altura="clamp(320px, 52vh, 560px)"
             selecionado={selecionado}
             aoSelecionar={selecionar}
+            denuncias={marcadoresDenuncia}
             pontos={localidades.map((l) => ({
               id: l.trilha.id,
               lat: l.trilha.lat,
@@ -183,7 +205,7 @@ export default function Painel({ trilhas }) {
           <h2>Prioridade de mobilização</h2>
           {localidades.length === 0 && (
             <div className="cartao suave">
-              Nenhuma viagem cadastrada para o período. {!temExemplos && 'Use "Carregar dados de exemplo" para a demonstração.'}
+              Nenhuma viagem ou denúncia para o período. {!temExemplos && 'Use "Carregar dados de exemplo" para a demonstração.'}
             </div>
           )}
           <ol className="prioridades">
@@ -204,6 +226,38 @@ export default function Painel({ trilhas }) {
       <AvisoProvaDeConceito />
 
       <div className="alertas-ao-vivo" aria-live="assertive">
+        {novasDenuncias.map((denuncia) => {
+          const trilha = trilhas.find((t) => t.id === denuncia.trilhaId);
+          return (
+            <div key={denuncia.id} className="alerta-ao-vivo alerta-ao-vivo--denuncia" role="alert">
+              <div className="linha" style={{ gap: 8 }}>
+                <Icone nome="alerta" tamanho={22} />
+                <strong>DENÚNCIA DE CABEÇA D'ÁGUA</strong>
+              </div>
+              <p>
+                <strong>{trilha?.nome ?? 'Local informado por GPS'}</strong>
+                {denuncia.pessoasEmPerigo && ' · PESSOAS EM PERIGO'}
+                <br />
+                {denuncia.sinais.map(rotuloSinal).join(' · ')}
+              </p>
+              <div className="linha">
+                <button
+                  className="botao botao--pequeno"
+                  style={{ background: '#fff', color: 'var(--grafite)' }}
+                  onClick={() => {
+                    selecionar(denuncia.trilhaId ?? `denuncia-${denuncia.id}`);
+                    dispensarDenuncia(denuncia.id);
+                  }}
+                >
+                  Ver no mapa
+                </button>
+                <button className="botao botao--pequeno botao--fantasma" onClick={() => dispensarDenuncia(denuncia.id)}>
+                  Dispensar
+                </button>
+              </div>
+            </div>
+          );
+        })}
         {novosAlertas.map((viagem) => {
           const trilha = trilhas.find((t) => t.id === viagem.trilhaId);
           return (
@@ -241,6 +295,69 @@ export default function Painel({ trilhas }) {
   );
 }
 
+function DenunciasAbertas({ denuncias, trilhas, aoVer }) {
+  const [atendendo, setAtendendo] = useState(null);
+
+  const atender = async (id) => {
+    setAtendendo(id);
+    try {
+      await marcarAtendida(id);
+    } catch (e) {
+      console.error(e);
+      window.alert('Não foi possível atualizar a denúncia.');
+    } finally {
+      setAtendendo(null);
+    }
+  };
+
+  return (
+    <section className="denuncias">
+      <div className="denuncias__titulo">
+        <Icone nome="alerta" tamanho={24} />
+        <h2>Denúncias de cabeça d'água em aberto</h2>
+        <span className="denuncias__contagem">{denuncias.length}</span>
+      </div>
+      <ul>
+        {[...denuncias].reverse().map((denuncia) => {
+          const trilha = trilhas.find((t) => t.id === denuncia.trilhaId);
+          const telefone = denuncia.autor?.telefone;
+          return (
+            <li key={denuncia.id} className="denuncia">
+              <div className="linha entre" style={{ alignItems: 'flex-start' }}>
+                <div>
+                  <strong>{trilha?.nome ?? 'Fora das trilhas mapeadas'}</strong>
+                  <div className="pequeno suave">
+                    {trilha ? trilha.cidade : `${denuncia.lat?.toFixed(4)}, ${denuncia.lng?.toFixed(4)}`} · {tempoDecorrido(denuncia.criadaEm)}
+                  </div>
+                </div>
+                {denuncia.pessoasEmPerigo && <span className="denuncia__perigo">Pessoas em perigo</span>}
+              </div>
+              <div className="pequeno">{denuncia.sinais.map(rotuloSinal).join(' · ')}</div>
+              {denuncia.observacao && <div className="pequeno denuncia__obs">“{denuncia.observacao}”</div>}
+              <div className="pequeno suave linha quebra">
+                Denunciante: {denuncia.autor?.nome ?? 'não informado'}
+                {telefone && (
+                  <a className="linha" style={{ gap: 4 }} href={`tel:${telefone.replace(/[^\d+]/g, '')}`}>
+                    <Icone nome="telefone" tamanho={12} /> {telefone}
+                  </a>
+                )}
+              </div>
+              <div className="denuncia__acoes">
+                <button className="botao botao--secundario botao--pequeno" onClick={() => aoVer(denuncia.trilhaId ?? `denuncia-${denuncia.id}`)}>
+                  <Icone nome="mapa" tamanho={16} /> Ver no mapa
+                </button>
+                <button className="botao botao--escuro botao--pequeno" onClick={() => atender(denuncia.id)} disabled={atendendo === denuncia.id}>
+                  <Icone nome="check" tamanho={16} /> Marcar como atendida
+                </button>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
 function Indicador({ icone, valor, rotulo, detalhe, destaque }) {
   return (
     <div className={`indicador${destaque ? ' indicador--destaque' : ''}`}>
@@ -273,6 +390,13 @@ function CartaoLocalidade({ localidade, posicao, aberto, aoAlternar }) {
         <Numero icone="idoso" valor={localidade.idosos} rotulo="idosos" />
         <Numero icone="boia" valor={localidade.naoNadam} rotulo="não nadam" />
       </div>
+
+      {localidade.denuncias > 0 && (
+        <div className="localidade__alerta localidade__alerta--denuncia">
+          <Icone nome="alerta" tamanho={16} />
+          {localidade.denuncias} denúncia(s) de cabeça d'água em aberto
+        </div>
+      )}
 
       {localidade.sinalizadas > 0 && (
         <div className="localidade__alerta">

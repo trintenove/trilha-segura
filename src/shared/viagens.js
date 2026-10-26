@@ -6,20 +6,23 @@
 //                   ele preencher os dados do grupo;
 //  - 'confirmada' → a reserva foi concluída com os dados do grupo.
 
-import { useEffect, useRef, useState } from 'react';
-import { armazenamentoLocal, gravarLocal, lerLocal } from './armazenamento/local.js';
-import { criarArmazenamentoSupabase } from './armazenamento/supabase.js';
+import { criarArmazenamento, useRegistros } from './armazenamento/index.js';
+import { gravarLocal, lerLocal } from './armazenamento/local.js';
 import { calcularRisco, exigeAlertaBombeiros } from './risco.js';
 import { aleatorioComSemente } from './data/fontes.js';
 import { hojeISO } from './datas.js';
 
-const URL_SUPABASE = import.meta.env.VITE_SUPABASE_URL;
-const CHAVE_SUPABASE = import.meta.env.VITE_SUPABASE_KEY;
-
-// Com as variáveis do Supabase configuradas, os dados ficam online;
-// sem elas, ficam só neste navegador.
-export const armazenamento =
-  URL_SUPABASE && CHAVE_SUPABASE ? criarArmazenamentoSupabase(URL_SUPABASE, CHAVE_SUPABASE) : armazenamentoLocal;
+const armazenamento = criarArmazenamento('viagens', {
+  trilhaId: 'trilha_id',
+  data: 'data',
+  status: 'status',
+  riscoNoCadastro: 'risco_no_cadastro',
+  sinalizadaBombeiros: 'sinalizada_bombeiros',
+  aceitouRisco: 'aceitou_risco',
+  responsavel: 'responsavel',
+  pessoas: 'pessoas',
+  demo: 'demo',
+});
 
 // Faixa etária de cada pessoa do grupo, escolhida com um toque.
 export const FAIXAS = [
@@ -89,26 +92,8 @@ export async function cancelarViagem(id) {
 // ---- Leitura ao vivo -------------------------------------------------------
 
 export function useViagens() {
-  const [estado, setEstado] = useState({ viagens: [], carregando: true, erro: null });
-  const pedido = useRef(0);
-
-  useEffect(() => {
-    const recarregar = () => {
-      const meuPedido = ++pedido.current;
-      armazenamento
-        .listar()
-        .then((viagens) => meuPedido === pedido.current && setEstado({ viagens, carregando: false, erro: null }))
-        .catch((erro) => meuPedido === pedido.current && setEstado((atual) => ({ ...atual, carregando: false, erro })));
-    };
-    recarregar();
-    const cancelar = armazenamento.assinar(recarregar);
-    return () => {
-      pedido.current++;
-      cancelar();
-    };
-  }, []);
-
-  return estado;
+  const { registros, carregando, erro } = useRegistros(armazenamento);
+  return { viagens: registros, carregando, erro };
 }
 
 // ---- Dados de exemplo para a apresentação ----------------------------------

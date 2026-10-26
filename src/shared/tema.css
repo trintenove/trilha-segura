@@ -403,6 +403,26 @@ a {
   }
 }
 
+/* Denúncia de cabeça d'água no mapa */
+.marcador-denuncia {
+  display: grid;
+  place-items: center;
+  background: var(--grafite);
+  border: 3px solid var(--amarelo);
+  border-radius: 50%;
+  color: var(--amarelo);
+  font-weight: 800;
+  font-size: 18px;
+  box-shadow: 0 0 0 0 rgba(255, 194, 14, 0.7);
+  animation: pulso-denuncia 1.4s ease-out infinite;
+}
+
+@keyframes pulso-denuncia {
+  to {
+    box-shadow: 0 0 0 16px rgba(255, 194, 14, 0);
+  }
+}
+
 /* ---- Carregando ---------------------------------------------------------- */
 
 .carregando {
@@ -430,6 +450,7 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .ponto-critico,
+  .marcador-denuncia,
   .giro {
     animation: none;
   }

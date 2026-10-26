@@ -3,14 +3,14 @@ import Icone from '../shared/componentes/Icone.jsx';
 import MapaRisco from '../shared/componentes/MapaRisco.jsx';
 import { BarraRisco, LegendaRisco, SeloRisco } from '../shared/componentes/Risco.jsx';
 import { AvisoProvaDeConceito } from '../shared/componentes/Comuns.jsx';
-import { formatarHora } from '../shared/datas.js';
+import { formatarHora, tempoDecorrido } from '../shared/datas.js';
 
 const ORDENS = {
   risco: (a, b) => b.hoje.risco - a.hoje.risco,
   nome: (a, b) => a.nome.localeCompare(b.nome),
 };
 
-export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
+export default function Trilhas({ trilhas, denuncias, atualizadoEm, aoAbrir }) {
   const [busca, setBusca] = useState('');
   const [ordem, setOrdem] = useState('risco');
   const [visao, setVisao] = useState('lista');
@@ -23,6 +23,7 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
   }, [trilhas, busca, ordem]);
 
   const criticas = trilhas.filter((t) => t.hoje.risco > 80).length;
+  const ultimaDenuncia = (trilhaId) => denuncias.filter((d) => d.trilhaId === trilhaId).at(-1);
 
   return (
     <div className="pagina">
@@ -87,6 +88,11 @@ export default function Trilhas({ trilhas, atualizadoEm, aoAbrir }) {
                     <SeloRisco risco={trilha.hoje.risco} comNumero={false} />
                   </div>
                 </div>
+                {ultimaDenuncia(trilha.id) && (
+                  <div className="selo-denuncia">
+                    <Icone nome="sirene" tamanho={16} /> Cabeça d'água denunciada {tempoDecorrido(ultimaDenuncia(trilha.id).criadaEm)}
+                  </div>
+                )}
                 <BarraRisco risco={trilha.hoje.risco} />
                 <div className="linha pequeno suave quebra" style={{ gap: 14 }}>
                   <span className="linha" style={{ gap: 4 }}>

@@ -41,11 +41,10 @@ describe('níveis e alerta', () => {
 });
 
 describe('agregação para os bombeiros', () => {
-  const trilha = (id, riscos) => ({
-    id,
-    nome: id,
-    previsao: riscos.map((risco, i) => ({ data: `2026-01-0${i + 1}`, risco })),
-  });
+  const trilha = (id, riscos) => {
+    const previsao = riscos.map((risco, i) => ({ data: `2026-01-0${i + 1}`, risco }));
+    return { id, nome: id, previsao, hoje: previsao[0] };
+  };
   const trilhas = [trilha('a', [40, 90]), trilha('b', [70, 70]), trilha('c', [95, 95])];
   const pessoa = (faixa, sabeNadar = true) => ({ faixa, sabeNadar });
   const viagens = [
@@ -67,6 +66,18 @@ describe('agregação para os bombeiros', () => {
     expect(resultado[0].risco).toBe(90);
     expect(resultado[0].sinalizadas).toBe(2);
     expect(resultado[0].gruposNaoInformados).toBe(1);
+  });
+
+  it('coloca local com denúncia aberta no topo, mesmo sem viagens', () => {
+    const denuncias = [
+      { trilhaId: 'c', status: 'aberta' },
+      { trilhaId: 'b', status: 'aberta' },
+      { trilhaId: 'a', status: 'atendida' },
+    ];
+    const resultado = agregarPorLocalidade(trilhas, viagens, { de: '2026-01-01', ate: '2026-01-02' }, denuncias);
+    expect(resultado.map((l) => l.trilha.id)).toEqual(['c', 'b', 'a']);
+    expect(resultado[0]).toMatchObject({ total: 0, denuncias: 1 });
+    expect(resultado[2].denuncias).toBe(0);
   });
 
   it('respeita o período escolhido', () => {
