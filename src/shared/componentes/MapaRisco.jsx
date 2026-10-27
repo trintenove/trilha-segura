@@ -11,8 +11,8 @@ const CENTRO_MINAS = [-19.8, -44.6];
 const ICONE_DENUNCIA = L.divIcon({
   className: 'marcador-denuncia',
   html: '<span>!</span>',
-  iconSize: [30, 30],
-  iconAnchor: [15, 15],
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
 });
 
 // Mostra o estado de Minas inteiro, ou voa até o ponto selecionado.

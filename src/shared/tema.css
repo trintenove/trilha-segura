@@ -398,7 +398,7 @@ a {
     stroke-opacity: 1;
   }
   50% {
-    stroke-width: 14;
+    stroke-width: 8;
     stroke-opacity: 0.35;
   }
 }
@@ -412,14 +412,14 @@ a {
   border-radius: 50%;
   color: var(--amarelo);
   font-weight: 800;
-  font-size: 18px;
+  font-size: 14px;
   box-shadow: 0 0 0 0 rgba(255, 194, 14, 0.7);
   animation: pulso-denuncia 1.4s ease-out infinite;
 }
 
 @keyframes pulso-denuncia {
   to {
-    box-shadow: 0 0 0 16px rgba(255, 194, 14, 0);
+    box-shadow: 0 0 0 10px rgba(255, 194, 14, 0);
   }
 }
 

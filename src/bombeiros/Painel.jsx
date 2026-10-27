@@ -191,7 +191,7 @@ export default function Painel({ trilhas }) {
               lat: l.trilha.lat,
               lng: l.trilha.lng,
               risco: l.risco,
-              raio: Math.min(36, 8 + Math.sqrt(l.total + l.gruposNaoInformados) * 4),
+              raio: Math.min(20, 5 + Math.sqrt(l.total + l.gruposNaoInformados) * 2.5),
               titulo: l.trilha.nome,
               detalhe: `${l.total} pessoas · ${l.vulneraveis} vulneráveis${l.sinalizadas ? ` · ${l.sinalizadas} potencial(is) vítima(s)` : ''}`,
             }))}

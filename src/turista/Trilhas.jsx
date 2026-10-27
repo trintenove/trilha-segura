@@ -13,7 +13,7 @@ const ORDENS = {
 export default function Trilhas({ trilhas, denuncias, atualizadoEm, aoAbrir }) {
   const [busca, setBusca] = useState('');
   const [ordem, setOrdem] = useState('risco');
-  const [visao, setVisao] = useState('lista');
+  const [visao, setVisao] = useState('mapa');
 
   const visiveis = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -46,11 +46,11 @@ export default function Trilhas({ trilhas, denuncias, atualizadoEm, aoAbrir }) {
       <div className="linha entre quebra">
         <input className="entrada" style={{ flex: '1 1 200px' }} placeholder="Buscar trilha, cidade ou região" value={busca} onChange={(e) => setBusca(e.target.value)} />
         <div className="alternador" role="group" aria-label="Visualização">
-          <button aria-pressed={visao === 'lista'} onClick={() => setVisao('lista')}>
-            Lista
-          </button>
           <button aria-pressed={visao === 'mapa'} onClick={() => setVisao('mapa')}>
             Mapa
+          </button>
+          <button aria-pressed={visao === 'lista'} onClick={() => setVisao('lista')}>
+            Lista
           </button>
         </div>
       </div>
